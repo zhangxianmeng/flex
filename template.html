@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>产品列表</title>
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="stylesheet" href="css/flex-layout.css">
+
+  <style>
+    body{
+      font-size: 0.28rem;
+      color:#666;
+    }
+    .leftimg{
+      width:100%;
+    }
+    .txt{
+      padding: 0 .2rem;
+    }
+    .padding{
+      padding:.2rem 0;
+    }
+    .price span{
+      color:#ca4341;
+      font-size: .38rem;
+      padding:.1rem 0;
+      display: block;
+    }
+    .old-price{
+      color:#999;
+      text-decoration: line-through;
+    }
+    .ellipsis,.ellipsis-2,.ellipsis-3,.ellipsis-4{
+      display: -webkit-box;
+      overflow: hidden;
+      white-space: normal!important;
+      text-overflow: ellipsis;
+      word-wrap: break-word;
+      -webkit-box-orient: vertical;
+    }
+    .ellipsis{
+      -webkit-line-clamp: 1;
+    }
+    .ellipsis-2{
+      -webkit-line-clamp: 2;
+    }
+    .ellipsis-3{
+      -webkit-line-clamp: 3;
+    }
+    .ellipsis-4{
+      -webkit-line-clamp: 4;
+    }
+  </style>
+</head>
+<body>
+<ul>
+  <li class="flex-column padding">
+    <div class="flex-item-10 flex-middle" style="padding:0 .2rem">
+      <img class="leftimg" src="img/p.jpg" alt=""/>
+    </div>
+    <div class="flex-item-14 flex-center flex-middle">
+      <div class="txt">
+        <p class="title ellipsis">舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱</p>
+        <p class="price"><span>￥0.22</span></p>
+        <span class="old-price">￥0.22</span>
+      </div>
+    </div>
+  </li>
+  <li class="flex-column padding">
+    <div class="flex-item-10 flex-middle" style="padding:0 .2rem">
+      <img class="leftimg" src="img/p.jpg" alt=""/>
+    </div>
+    <div class="flex-item-14 flex-center flex-middle">
+      <div class="txt">
+        <p class="title ellipsis-2">舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱</p>
+        <p class="price"><span>￥0.22</span></p>
+        <span class="old-price">￥0.22</span>
+      </div>
+    </div>
+  </li>
+  <li class="flex-column padding">
+    <div class="flex-item-10 flex-middle" style="padding:0 .2rem">
+      <img class="leftimg" src="img/p.jpg" alt=""/>
+    </div>
+    <div class="flex-item-14 flex-center flex-middle">
+      <div class="txt">
+        <p class="title ellipsis-3">舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱</p>
+        <p class="price"><span>￥0.22</span></p>
+        <span class="old-price">￥0.22</span>
+      </div>
+    </div>
+  </li>
+  <li class="flex-column padding">
+    <div class="flex-item-10 flex-middle" style="padding:0 .2rem">
+      <img class="leftimg" src="img/p.jpg" alt=""/>
+    </div>
+    <div class="flex-item-14 flex-center flex-middle">
+      <div class="txt">
+        <p class="title ellipsis-4">舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱舒适地带果漾身体去角质啫喱</p>
+        <p class="price"><span>￥0.22</span></p>
+        <span class="old-price">￥0.22</span>
+      </div>
+    </div>
+  </li>
+</ul>
+
+<script>
+  (function(win){
+    var pageWidth = 6.4; /////设计图宽度640/100
+    windowScale = function(){
+      document.documentElement.style.fontSize = window.innerWidth/pageWidth + 'px';
+    }
+    windowScale();
+    window.onresize = windowScale;
+  })(window);
+</script>
+</body>
+</html>
