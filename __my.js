@@ -101,16 +101,6 @@ __.actionPanelTab = function(hd,panel,callback){ //tab切换
 		}
 	})
 }
-__.actionPanelTabSwitch = function(hd,panel,callback){ //tab切换
-	hd.on("click",function(event){
-		var index = $(this).index();
-		$(this).addClass("active").siblings().removeClass("active");
-		panel.eq(index).show().siblings().hide();
-		if(callback){
-			callback(index);
-		}
-	})
-}
 __.actionPostForm = function(param) { //post
     if ($(this).hasClass("disable")) {
         return;
@@ -139,12 +129,13 @@ __.loaddingWindowSuccess = function(label){  //成功提示
 	timer = setTimeout(function(){
 		$("#loaddingWindow").hide();
 		timer = null;
-	},1500)
+	},1000)
 } 
 __.loaddingWindowHide = function(){ //隐藏弹出
 	$("#loaddingWindow").hide();
 }
 __.cartAddAnimate = function(qty){ //购物车动画
+	
 	$("#fixed-cart .add").addClass("add-on").html("+" + qty);
 	var time = setTimeout(function(){
 		$("#fixed-cart .add").removeClass("add-on");
@@ -252,10 +243,7 @@ __.getRangeExtend = function(obj,callback){ //获取+1 -1
 			return;
 		}
 		input.val(Number(input.val())+num)
-		if(input.val() >= input.data("max")){
-			input.val(input.data("max"));
-		}
-		if(input.val() == 0){
+		if(input.val()==0){
 			minus.addClass("ico-minus-disable")
 		}else{
 			minus.removeClass("ico-minus-disable")
@@ -263,8 +251,8 @@ __.getRangeExtend = function(obj,callback){ //获取+1 -1
 		if(callback){
 			callback(obj,input.val()) //回调
 		}
-	});
-};
+	})
+}
 __.actionRegInput = function(obj,callback) { //表单验证的
 	var stutas = true;
 	for (var x in obj) {
@@ -376,7 +364,7 @@ __.postServer = function(url,obj,callback){
 	$.post(url+ __.getRandom(),obj,function(data){
 		callback(data);
 	})
-};
+}
 __.getAlertBox = function(obj){ //模拟alert
 	if($("#getAlertBox").size()>0){
 		$("#getAlertBox").show();
@@ -455,7 +443,7 @@ $.postServer = function(options) {
 	opts.start();
 	$.ajax({
 		type : "POST",
-		url : opts.url || __.getUrl("/ajaxpost/" + opts.business),
+		url : __.getUrl("/ajaxpost/" + opts.business),
 		data : opts.data,
 		statusCode : {
 			998: function() {
@@ -467,23 +455,16 @@ $.postServer = function(options) {
 	        }
 		},
 		success : function(data, textStatus, jqXHR) {
-			
 			if(data.Success){
 				opts.finish(data)
 			}else{
-				__.loaddingWindowHide();
 				__.getAlertWarning({txt : data.Msg})
 			}
-		},
-		error: function(data) {
-			__.loaddingWindowHide();
-			__.getAlertWarning({txt : data.responseJSON.Msg})
 		}
 	})
 }
 $.postServer.defaults = {
 	data : {},
-	url : "",
 	business : "",
 	start : function(){ __.loaddingWindowShow("请求加载中...") },
 	finish : function(data){ __.loaddingWindowSuccess("添加成功"); }
@@ -496,15 +477,10 @@ $.getServer = function(options) {
     	param += ("&"+i+'='+ opts.param[i]);
     }; //get参数
     var url ;
-    
-    if(opts.pageindex==0){
-    	opts.firstGetSart();
-    }
-    //firstGet
     if(opts.url){
-    	url = getGlobalUrlAdmin + "/" + opts.url + __.getRandom() + param + "&size=" + opts.size + "&pageindex="  + opts.pageindex ;
+    	url = getGlobalUrlAdmin + "/" + opts.url;
     }else{
-    	url = __.getUrl("/ajaxget/" + ( opts.getType || "slstd") + "/" + opts.business) + __.getRandom() + param + "&size=" + opts.size + "&pageindex="  + opts.pageindex 
+    	url = __.getUrl("/ajaxget/" + ( opts.getType || "slstd") + "/" + opts.business) + param + "&size=" + opts.size + "&pageindex="  + opts.pageindex 
     }
     $.ajax({
     	url: url ,  //url
@@ -518,23 +494,20 @@ $.getServer = function(options) {
 	        }
 	    },
 		success : function(data, textStatus) {  //成功
-			if(opts.pageindex==0){
-		    	opts.firstGetEnd();
-		    }
-			if(data.Msg){
-				alert(data.Msg)
-			} 
-			var getdata = data;
-	     	if(opts.getType == "do" && opts.table){  //获取dataobject 
-	     		getdata = data.data[opts.table]
-	     	}
-	     	if (getdata.length < opts.size && getdata.length >= 0){
-		    	opts.dataLessSize(getdata);
-		    	opts.dataEmpty();
-		    }else{
-		    	opts.moreData(getdata);
-		    }
-		    opts.finish(getdata);
+				if(data.Msg){
+					__.getAlertWarning({txt : data.Msg})
+				} 
+				var getdata = data;
+		     	if(opts.getType == "do" && opts.table){  //获取dataobject 
+		     		getdata = data.data[opts.table]
+		     	}
+		     	if (getdata.length < opts.size && getdata.length >= 0){
+			    	opts.dataLessSize(getdata);
+			    	opts.dataEmpty();
+			    }else{
+			    	opts.moreData(getdata);
+			    }
+			    opts.finish(getdata);
 			
 		}
     });
@@ -551,39 +524,18 @@ $.getServer.defaults = {
 	dataLessSize : function(data){ },
 	moreData : function(data){},
 	dataEmpty : function(data){},
-	finish: function(data){},
-	firstGetSart:function(){},
-	firstGetEnd:function(){}
+	finish: function(data){}
 };
 __.getScrollData = function(obj){
 	var loading = false , loadingStatus = true ,pageindex = 0;
-	$.getServer({
-		table : ( obj.table || ""),getType : ( obj.getType || ""),param : ( obj.param || {}),business : obj.business,dataLessSize:obj.dataLessSize,moreData:obj.moreData,pageindex: 0,size: (obj.size||__.getPageSize),dataEmpty:function(){loadingStatus = !loadingStatus}
-	});
+	$.getServer({table : ( obj.table || ""),getType : ( obj.getType || ""),param : ( obj.param || {}),business : obj.business,dataLessSize:obj.dataLessSize,moreData:obj.moreData,pageindex: pageindex = 0,dataEmpty:function(){loadingStatus = !loadingStatus}});
 	$(window).on('scroll',function(){
         if ( loading ){return ;}
         else {
         	if($(window).scrollTop()+$(window).height() > $(document).height()-200){
                 loading = !loading;
                 if(loadingStatus){
-                    $.getServer({table : ( obj.table || ""),getType : ( obj.getType || ""),param : ( obj.param || {}),business : obj.business,dataLessSize:obj.dataLessSize,moreData:obj.moreData,pageindex: pageindex += (obj.size||__.getPageSize),size: (obj.size||__.getPageSize),finish : function(data){loading = !loading},dataEmpty:function(){loadingStatus = !loadingStatus}});
-                }
-            }
-        }
-    })
-};
-$.getScrollData = function(obj){
-	var loading = false , loadingStatus = true ,pageindex = 0;
-	$.getServer({
-		table : ( obj.table || ""),getType : ( obj.getType || ""),param : ( obj.param || {}),business : obj.business,dataLessSize:obj.dataLessSize,moreData:obj.moreData,pageindex: 0,size: (obj.size||__.getPageSize),dataEmpty:function(){loadingStatus = !loadingStatus}
-	});
-	$(window).on('scroll',function(){
-        if ( loading ){return ;}
-        else {
-        	if($(window).scrollTop()+$(window).height() > $(document).height()-200){
-                loading = !loading;
-                if(loadingStatus){
-                     $.getServer({table : ( obj.table || ""),getType : ( obj.getType || ""),param : ( obj.param || {}),business : obj.business,dataLessSize:obj.dataLessSize,moreData:obj.moreData,pageindex: pageindex += (obj.size||__.getPageSize),size: (obj.size||__.getPageSize),finish : function(data){loading = !loading},dataEmpty:function(){loadingStatus = !loadingStatus}});
+                    $.getServer({table : ( obj.table || ""),getType : ( obj.getType || ""),param : ( obj.param || {}),business : obj.business,dataLessSize:obj.dataLessSize,moreData:obj.moreData,pageindex: pageindex += __.getPageSize,finish : function(data){loading = !loading},dataEmpty:function(){loadingStatus = !loadingStatus}});
                 }
             }
         }
@@ -605,169 +557,7 @@ __.getHashDdefault = function(callback){
 	    }
     })
 };
-$.fn.regFormEveryone = function(options){ //验证
-	var opts = $.extend({}, $.fn.regFormEveryone.defaults, options);
-	var canSaveStatus = false;
-	var regFormEveryoneEmptyTimer;
-	var _this = $(this);
-	_this.find(".reg").on("focus",function(){
-		regFormEveryoneEmptyTimer = setInterval(function(){
-			_this.find(".reg").each(function(){
-				if($(this).val() == ""){ 
-					canSaveStatus = false  ; return false;
-				}else if($(this).attr("max")){
-					canSaveStatus = true;
-					if(Math.abs(Number($(this).val())) > $(this).attr("max")){
-						$(this).val(Number($(this).attr("max")));
-					}else if(Number($(this).val()) < 0){
-						$(this).val(0);
-					}else{
-						$(this).val(Number($(this).val()));
-					}
-				}
-				else{
-					canSaveStatus = true;
-				}
-			})
-			if(canSaveStatus){
-				opts.finish(canSaveStatus)
-			}else{
-				opts.finish(canSaveStatus)
-			}
-		},500)
-	})
-	$(this).find(".reg").on("blur",function(){
-		clearInterval(regFormEveryoneEmptyTimer);
-	})
-	function isRegFormEveryone (){
-		var status = true;
-		$("input.reg").each(function(){
-			var type= $(this).data("type");
-			if(type=="mobile"){
-				if(!/0?(13|14|15|18)[0-9]{9}/.test($(this).val())){
-					alert($(this).data("tips"))
-					status = false;
-				}
-			}
-		})
-		return status;
-	}
-};
-$.getScrollTableData = function(options){
-    var opts = $.extend({}, $.getScrollTableData.defaults, options);  //继承
-    //第一次请求
-    var tabindex = opts.index||0 ;
-    var loading = false;  //不在滚动中状态
-    function getFirstLoading(){
-        $.getServer({
-            business : opts.data[tabindex].business,
-            param : opts.data[tabindex].param,
-            pageindex : opts.data[tabindex].pageindex,
-            dataLessSize: function(data){
-                $(opts.data[tabindex].tmpl).tmpl(data).appendTo(opts.data[tabindex].id); //tmpl
-                $(opts.data[tabindex].id).next().html("已全部加载完成！");
-                opts.data[tabindex].loadingstatus = false;
-                opts.data[tabindex].pageindex += opts.data[tabindex].size;
-                loading = false;
-                opts.callback(data)
-            },
-            moreData:function(data){
-                $(opts.data[tabindex].tmpl).tmpl(data).appendTo(opts.data[tabindex].id); //tmpl
-                opts.data[tabindex].pageindex += opts.data[tabindex].size;
-                loading = false;
-                opts.callback(data)
 
-            },
-            size: opts.data[tabindex].size,
-            dataEmpty:function(){opts.data[tabindex].loadingstatus = false;loading = false;}
-        });
-    }
-    getFirstLoading();
-    
-    $(opts.data[tabindex].title).eq(tabindex).addClass("active").siblings().removeClass("active");
-    $(".panel").hide().eq(tabindex).show();
-    
-    $(opts.data[tabindex].title).on("click",function(){
-        loading = false;  //不在滚动中状态
-        tabindex = $(this).index();
-        $(this).addClass("active").siblings().removeClass("active");
-        $(".panel").hide().eq(tabindex).show();
-        if(opts.data[tabindex].pageindex == 0){
-            getFirstLoading();
-        }
-    })
-    
-    $(window).on('scroll',function(){
-        if ( loading ){return ;}
-        else {
-            if($(window).scrollTop()+$(window).height() > $(document).height()-200){
-                loading = !loading;
-                if(opts.data[tabindex].loadingstatus){
-                    $.getServer({
-                        business : opts.data[tabindex].business,
-                        param : opts.data[tabindex].param,
-                        pageindex : opts.data[tabindex].pageindex,
-                        dataLessSize: function(data){
-                            $(opts.data[tabindex].tmpl).tmpl(data).appendTo(opts.data[tabindex].id); //tmpl
-                            $(opts.data[tabindex].id).next().html("已全部加载完成！");
-                            opts.data[tabindex].loadingstatus = false;
-                            opts.data[tabindex].pageindex += opts.data[tabindex].size;
-                            loading = false;
-                            opts.callback(data)
-                        },
-                        moreData:function(data){
-                            $(opts.data[tabindex].tmpl).tmpl(data).appendTo(opts.data[tabindex].id); //tmpl
-                            opts.data[tabindex].pageindex += opts.data[tabindex].size;
-                            loading = false;
-                            opts.callback(data)
-
-                        },
-                        size: opts.data[tabindex].size,
-                        dataEmpty:function(){opts.data[tabindex].loadingstatus = false;loading = false;}
-                    });
-                }
-            }
-        }
-    })
-}
-$.getScrollTableData.defaults = {
-    data : [],
-    index: 0,
-    callback : function(){
-    	
-    }
-};
-$.fn.regFormEveryone.defaults = {
-	finish : function(status){
-	}
-};
-$.regexpFormPost = function (form,callback){
-  	var regItem = form.find("[data-require = 'require']");
-	var status = true;
-	for (var i = 0; i < regItem.length; i++) {
-		if(regItem.eq(i).val() == ""){
-			status = false;
-  			regItem.eq(i).addClass("input-warn");
-  		}else{
-  			regItem.eq(i).removeClass("input-warn");
-  			if(regItem.eq(i).data("regexp") && status){
-  		  		var reg = regItem.eq(i).data("regexp");
-  		  		if(reg == "mobile"){
-  		  			if(!/0?(13|14|15|18)[0-9]{9}/.test(regItem.eq(i).val())){
-  						status = false;
-  						__.getAlertWarning({txt : "请填写正确的手机号码！"})
-  					}else{
-  						
-  					}
-  		  			
-  		  		}
-  		  	}
-  		}
- 	};
- 	if(status){
- 		callback();
- 	}
-}
 function globalComdify(n)
 {
 	var re=/\d{1,3}(?=(\d{3})+$)/g;
@@ -775,82 +565,118 @@ function globalComdify(n)
 	return n1;
 }
 
+
 $.fn.getGlobalFixedSelectList = function(options){ //获取全局select list
-    var opts = $.extend({}, $.fn.getGlobalFixedSelectList.defaults, options);
-    $(this).empty();
-    var _this = $(this),
-        md = $("<div>",{
-                "class" : "global-fixed-select-list"
-            }
-        ),
-        bg = $("<div>",{
-                "class": "global-fixed-select-list-bg"
-            }
-        ),
-        body = $("<div>",{
-                "class": "global-fixed-select-list-box"
-            }
-        ),
-        wrap = 
-        $("<div>",{
-                "class": "global-fixed-select-list-wrap"
-            }
-        ),
-        hd = $("<div>",{
-                "class": "global-fixed-select-list-hd"
-            }
-        ),
-        dataList = $("<ul>",{
-                "id": "global-fixed-select-list",
-                "class" : opts.listClass
-            }
-        )
-    ;
-    hd.html('<a href="javascript:;" class="closed"><i class="ico ico-closed"></i></a><a href="javascript:;" class="clear" style="display:none">'+ opts.clearName +'</a><span>'+ opts.title +'</span>');
-    wrap.append(hd);
-    if( opts.clearName ){ hd.find(".clear").show(); }
-    hd.find(".clear").on("click",function(){
-        opts.change(null);
-        md.removeClass("global-fixed-select-list-active");
-        bg.hide();
-    })
-    if( opts.tmpl ){
-        $(opts.tmpl).tmpl(opts.data).appendTo(dataList);
-        wrap.append(dataList);
-    }
-    if( opts.html ){
-        wrap.append(opts.html);
-    }
-    dataList.find("li").on("click",function(){
-        var data = {};
-        for (var i = 0; i < opts.filterData.length; i++) {
-            data[opts.filterData[i]] = $(this).data(opts.filterData[i])
-        };
-        if(opts.changeBoxHide){
-            md.removeClass("global-fixed-select-list-active");
-            bg.hide();
-        }
-        opts.change(data);
-    })
-    hd.find(".closed").on("click",function(){
-        md.removeClass("global-fixed-select-list-active");
-        bg.hide();
-    })
-    md.append(bg);
-    body.append(wrap);
-    md.append(body);
-    _this.append(md);
-    setTimeout( function (){ md.addClass("global-fixed-select-list-active"); }, 100);
-    
+	var opts = $.extend({}, $.fn.getGlobalFixedSelectList.defaults, options);
+	$(this).empty();
+	var _this = $(this),
+		md = $("<div>",{
+				"class" : "global-fixed-select-list"
+			}
+		),
+		bg = $("<div>",{
+				"class": "global-fixed-select-list-bg"
+			}
+		),
+		body = $("<div>",{
+				"class": "global-fixed-select-list-box"
+			}
+		),
+		wrap =
+			$("<div>",{
+					"class": "global-fixed-select-list-wrap"
+				}
+			),
+		hd = $("<div>",{
+				"class": "global-fixed-select-list-hd"
+			}
+		),
+		dataList = $("<ul>",{
+				"id": "global-fixed-select-list",
+				"class" : opts.listClass
+			}
+		)
+		hd.html('<a href="javascript:;" class="closed"><i class="ico ico-closed"></i></a><a href="javascript:;" class="clear" style="display:none">'+ opts.clearName +'</a><span>'+ opts.title +'</span>');
+	wrap.append(hd);
+	if( opts.clearName ){ hd.find(".clear").show(); }
+	hd.find(".clear").on("click",function(){
+		opts.change(null);
+		md.removeClass("global-fixed-select-list-active");
+		bg.hide();
+	})
+	if( opts.tmpl ){
+		$(opts.tmpl).tmpl(opts.data).appendTo(dataList);
+		wrap.append(dataList);
+	}
+	if( opts.html ){
+		wrap.append(opts.html);
+	}
+	dataList.find("li").on("click",function(){
+		var data = {};
+		for (var i = 0; i < opts.filterData.length; i++) {
+			data[opts.filterData[i]] = $(this).data(opts.filterData[i])
+		};
+		if(opts.changeBoxHide){
+			md.removeClass("global-fixed-select-list-active");
+			bg.hide();
+		}
+		opts.change(data);
+	})
+	hd.find(".closed").on("click",function(){
+		md.removeClass("global-fixed-select-list-active");
+		bg.hide();
+	})
+	md.append(bg);
+	body.append(wrap);
+	md.append(body);
+	_this.append(md);
+	setTimeout( function (){ md.addClass("global-fixed-select-list-active"); }, 100);
+
 }
 $.fn.getGlobalFixedSelectList.defaults = {
-    title : '请选择',
-    listClass : 'list',
-    tmpl : '',
-    data : [],
-    filterData : [],
-    changeBoxHide : true , 
-    change : function(  data ){
+	title : '请选择',
+	listClass : 'list',
+	tmpl : '',
+	data : [],
+	filterData : [],
+	changeBoxHide : true ,
+	change : function(  data ){
 
-    }
+	}
 };
+
+//积分兑换模态框
+;(function($){
+	var IntegralModel = function(ele, opt){
+		this.$dom = ele,
+			this.defaults = {
+				count:'0',
+				url: 'http://www.baidu.com',
+				type: '您参与了评论送积分活动您参与了评论送积分活动',
+			},
+			this.options = $.extend({},this.defaults,opt)
+	}
+	IntegralModel.prototype = {
+		model: function(){
+			var self = this.$dom;
+			self.append('<div class="integral-model flex-column  flex-center flex-middle">\
+								<div class="integral-model-box">\
+									<img src="../images/coupon/integral.png" alt=""/>\
+									<i class="ico ico-closed-tip" style="top:-.8rem; right:-.8rem;z-index:10000;"></i>\
+									<div class="integral-info flex-row flex-center">\
+										<div class="integral-type ellipsis">'+this.options.type+'</div>\
+									<div class="integral-count">'+this.options.count+'积分</div>\
+								</div>\
+								<div class="integral-link"><a href="'+this.options.url+'">前往查看</a></div>\
+								</div>\
+						 </div>') ;
+			return self.find('.ico-closed-tip').click(function(){
+				self.find('.integral-model').hide();
+			})
+		}
+	}
+	$.fn.showIntegralModel = function(options){
+		var integralModel = new IntegralModel(this,options);
+		return integralModel.model();
+	}
+})(jQuery);
