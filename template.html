@@ -12,10 +12,6 @@
   <link rel="stylesheet" href="css/flex-layout.css">
 
   <style>
-    body{
-      font-size: 0.28rem;
-      color:#666;
-    }
     .leftimg{
       width:100%;
     }
@@ -35,26 +31,7 @@
       color:#999;
       text-decoration: line-through;
     }
-    .ellipsis,.ellipsis-2,.ellipsis-3,.ellipsis-4{
-      display: -webkit-box;
-      overflow: hidden;
-      white-space: normal!important;
-      text-overflow: ellipsis;
-      word-wrap: break-word;
-      -webkit-box-orient: vertical;
-    }
-    .ellipsis{
-      -webkit-line-clamp: 1;
-    }
-    .ellipsis-2{
-      -webkit-line-clamp: 2;
-    }
-    .ellipsis-3{
-      -webkit-line-clamp: 3;
-    }
-    .ellipsis-4{
-      -webkit-line-clamp: 4;
-    }
+
   </style>
 </head>
 <body>
@@ -110,15 +87,7 @@
 </ul>
 
 <script>
-  (function(win){
-    var pageWidth = 6.4; /////设计图宽度640/100
-    var docEl = document.documentElement;
-    windowScale = function(){
-      docEl.style.fontSize = docEl.getBoundingClientRect().width/pageWidth + 'px';
-    }
-    windowScale();
-    window.onresize = windowScale;
-  })(window);
+
 
 </script>
 </body>
